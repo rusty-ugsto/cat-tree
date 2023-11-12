@@ -37,7 +37,7 @@ pub struct Args {
     #[clap(
         short = 'F',
         long,
-        default_value = "{indent}<{file_name}> [{file_type}]"
+        default_value = "{{ indent }}<{{ path }}> [{{ file_type }}]"
     )]
     pub file_display_template: String,
 }

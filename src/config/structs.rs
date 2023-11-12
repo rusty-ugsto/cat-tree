@@ -1,6 +1,6 @@
 use std::{collections::HashSet, path::PathBuf};
 
-#[derive(Default, Debug)]
+#[derive(Default)]
 pub struct PartialConfig {
     pub root: Option<PathBuf>,
     pub exclude: HashSet<PathBuf>,
@@ -12,7 +12,7 @@ pub struct PartialConfig {
     pub file_display_template: Option<String>,
 }
 
-#[derive(Debug)]
+#[derive(Clone)]
 pub struct Config {
     pub root: PathBuf,
     pub exclude: HashSet<PathBuf>,
