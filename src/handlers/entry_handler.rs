@@ -10,7 +10,6 @@ pub struct EntryHandler {
     file_type: FileType,
     path: PathBuf,
     file_display_template: String,
-    content_display_template: String,
 }
 
 impl EntryHandler {
@@ -19,14 +18,12 @@ impl EntryHandler {
         file_type: FileType,
         path: PathBuf,
         file_display_template: String,
-        content_display_template: String,
     ) -> Self {
         Self {
             depth,
             file_type,
             path,
             file_display_template,
-            content_display_template,
         }
     }
 }
@@ -46,8 +43,7 @@ impl Handler for EntryHandler {
             .ok_or("Failed to convert path to string")?
             .to_string();
 
-        let mut data =
-            BTreeMap::from([("indent", indent), ("file_type", file_type), ("path", path)]);
+        let data = BTreeMap::from([("indent", indent), ("file_type", file_type), ("path", path)]);
 
         println!(
             "{}",
@@ -58,21 +54,19 @@ impl Handler for EntryHandler {
             let content = std::fs::read_to_string(&self.path)
                 .map_err(|e| e.to_string())?
                 .to_string();
-            data.insert("content", content);
+            let content = content
+                .lines()
+                .map(|l| {
+                    if l.is_empty() {
+                        l.to_string()
+                    } else {
+                        format!("{}{}", "  ".repeat(self.depth + 1), l)
+                    }
+                })
+                .collect::<Vec<String>>()
+                .join("\n");
 
-            handlebars
-                .register_template_string(
-                    "content_display_template",
-                    &self.content_display_template,
-                )
-                .map_err(|e| e.to_string())?;
-
-            println!(
-                "{}",
-                handlebars
-                    .render("content_display_template", &data)
-                    .unwrap()
-            )
+            println!("{}", content);
         }
 
         Ok(())

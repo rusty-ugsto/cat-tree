@@ -18,19 +18,10 @@ fn error_callback() -> Box<dyn Fn(String)> {
     })
 }
 
-fn list_file_service_callback(
-    file_display_template: String,
-    content_display_template: String,
-) -> ListFilesServiceCallback {
+fn list_file_service_callback(file_display_template: String) -> ListFilesServiceCallback {
     let callback = move |depth, file_type, path| {
-        if let Err(error) = EntryHandler::new(
-            depth,
-            file_type,
-            path,
-            file_display_template.clone(),
-            content_display_template.clone(),
-        )
-        .execute()
+        if let Err(error) =
+            EntryHandler::new(depth, file_type, path, file_display_template.clone()).execute()
         {
             error_callback()(error);
         }
@@ -52,10 +43,7 @@ fn main() {
         .all(config.all)
         .follow_links(config.follow_links)
         .flatten(config.flatten)
-        .callback(list_file_service_callback(
-            config.file_display_template,
-            config.content_display_template,
-        ))
+        .callback(list_file_service_callback(config.file_display_template))
         .error_callback(error_callback())
         .build()
         .execute();
