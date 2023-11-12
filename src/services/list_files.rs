@@ -1,22 +1,28 @@
+use walkdir::WalkDir;
+
 use crate::traits::service::Service;
-use std::path::{Path, PathBuf};
+use std::{
+    collections::HashSet,
+    fs::FileType,
+    path::{Path, PathBuf},
+};
 
 pub struct ListFilesService {
     root: PathBuf,
-    exclude: Vec<PathBuf>,
-    max_depth: Option<u8>,
+    exclude: HashSet<PathBuf>,
+    max_depth: Option<usize>,
     all: bool,
-    callback: Box<dyn Fn(PathBuf)>,
+    callback: Box<dyn Fn(usize, FileType, PathBuf)>,
     error_callback: Box<dyn Fn(String)>,
 }
 
 impl ListFilesService {
     pub fn new(
         root: PathBuf,
-        exclude: Vec<PathBuf>,
-        max_depth: Option<u8>,
+        exclude: HashSet<PathBuf>,
+        max_depth: Option<usize>,
         all: bool,
-        callback: Box<dyn Fn(PathBuf)>,
+        callback: Box<dyn Fn(usize, FileType, PathBuf)>,
         error_callback: Box<dyn Fn(String)>,
     ) -> Self {
         Self {
@@ -30,50 +36,45 @@ impl ListFilesService {
     }
 
     fn is_excluded(&self, path: &Path) -> bool {
-        self.exclude.iter().any(|exclude| path == *exclude)
+        self.exclude.contains(path)
     }
 
-    fn list_files_recursive(&self, root: &PathBuf, _depth: u8) {
-        if self.max_depth.is_some() && _depth >= self.max_depth.unwrap() {
-            return;
-        }
+    fn is_hidden(&self, path: &Path) -> bool {
+        path.file_name()
+            .map(|name| name.to_string_lossy().starts_with('.'))
+            .unwrap_or(false)
+    }
 
-        let entries = std::fs::read_dir(root);
+    fn is_max_depth_reached(&self, depth: usize) -> bool {
+        self.max_depth
+            .map(|max_depth| depth >= max_depth)
+            .unwrap_or(false)
+    }
 
-        if let Err(error) = entries {
-            (self.error_callback)(error.to_string());
-            return;
-        }
-
-        for entry in entries.unwrap() {
-            if let Err(error) = entry {
-                (self.error_callback)(error.to_string());
-                continue;
-            }
-
-            let entry = entry.unwrap();
-            let path = entry.path();
-
-            if path.starts_with(".") && !self.all {
-                continue;
-            }
-
-            if path.is_dir() {
-                self.list_files_recursive(&entry.path(), _depth + 1);
-                continue;
-            }
-
-            if self.is_excluded(path.as_path()) {
-                continue;
-            }
-
-            (self.callback)(path);
-        }
+    fn should_skip(&self, depth: usize, file_type: FileType, path: &Path) -> bool {
+        self.is_excluded(path)
+            || (self.is_hidden(path) && !self.all)
+            || self.is_max_depth_reached(depth)
+            || file_type.is_symlink()
     }
 }
 
 impl Service for ListFilesService {
     fn execute(&self) {
-        self.list_files_recursive(&self.root, 0);
+        let walker = WalkDir::new(&self.root).into_iter().filter_entry(|entry| {
+            !self.should_skip(entry.depth(), entry.file_type(), entry.path())
+        });
+        for entry in walker {
+            let entry = match entry {
+                Ok(entry) => entry,
+                Err(error) => {
+                    (self.error_callback)(error.to_string());
+                    continue;
+                }
+            };
+
+            let depth = entry.depth();
+            (self.callback)(depth, entry.file_type(), entry.path().to_path_buf());
+        }
     }
 }

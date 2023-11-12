@@ -1,11 +1,10 @@
-use std::{env, path::PathBuf};
-
 use super::structs::PartialConfig;
+use std::{collections::HashSet, env, path::PathBuf};
 
 pub struct Env {
     root: Option<PathBuf>,
-    exclude: Vec<PathBuf>,
-    max_depth: Option<u8>,
+    exclude: HashSet<PathBuf>,
+    max_depth: Option<usize>,
     size: Option<bool>,
     all: Option<bool>,
 }

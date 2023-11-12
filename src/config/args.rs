@@ -1,7 +1,7 @@
 use super::structs::PartialConfig;
 use crate::traits::loader::Loader;
 use clap::Parser;
-use std::path::PathBuf;
+use std::{collections::HashSet, path::PathBuf};
 
 #[derive(Parser)]
 pub struct Args {
@@ -15,14 +15,14 @@ pub struct Args {
 
     /// Define the maximum depth of directory traversal
     #[clap(short, long)]
-    pub max_depth: Option<u8>,
+    pub max_depth: Option<usize>,
 
     /// Optionally display the size of each file next to its name
     #[clap(short, long)]
     pub size: Option<bool>,
 
     /// Include hidden files and directories in the display
-    #[clap(short, long)]
+    #[clap(short, long, action=clap::ArgAction::SetTrue)]
     pub all: Option<bool>,
 }
 
@@ -36,7 +36,7 @@ impl From<Args> for PartialConfig {
     fn from(args: Args) -> Self {
         Self {
             root: args.root,
-            exclude: args.exclude,
+            exclude: HashSet::from_iter(args.exclude),
             max_depth: args.max_depth,
             size: args.size,
             all: args.all,
