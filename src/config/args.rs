@@ -11,7 +11,7 @@ pub struct Args {
 
     /// Exclude certain file types or directories from the display
     #[clap(short, long)]
-    pub exclude: Vec<String>,
+    pub exclude: Vec<PathBuf>,
 
     /// Define the maximum depth of directory traversal
     #[clap(short, long)]

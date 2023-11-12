@@ -4,7 +4,7 @@ use super::structs::PartialConfig;
 
 pub struct Env {
     root: Option<PathBuf>,
-    exclude: Vec<String>,
+    exclude: Vec<PathBuf>,
     max_depth: Option<u8>,
     size: Option<bool>,
     all: Option<bool>,
@@ -12,10 +12,11 @@ pub struct Env {
 
 impl Env {
     pub fn new() -> Env {
-        let exclude: Vec<String> = env::var("CAT_TREE_EXCLUDE")
+        let exclude = env::var("CAT_TREE_EXCLUDE")
             .unwrap_or_default()
             .split(',')
-            .map(String::from)
+            .filter(|s| !s.is_empty())
+            .map(PathBuf::from)
             .collect();
 
         Env {

@@ -15,12 +15,7 @@ impl ConfigBuilder {
     pub fn merge(mut self, other: PartialConfig) -> Self {
         self.config.root = other.root.or(self.config.root);
         if !other.exclude.is_empty() {
-            self.config.exclude = other
-                .exclude
-                .iter()
-                .filter(|s| !s.is_empty())
-                .cloned()
-                .collect();
+            self.config.exclude = other.exclude;
         }
         self.config.max_depth = other.max_depth.or(self.config.max_depth);
         self.config.size = other.size.or(self.config.size);
