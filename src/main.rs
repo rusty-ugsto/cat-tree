@@ -23,6 +23,7 @@ fn main() {
         config.exclude,
         config.max_depth,
         config.all,
+        config.follow_links,
         Box::new(|depth, file_type, path| {
             EntryHandler::new(
                 depth,
