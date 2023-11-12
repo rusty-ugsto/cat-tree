@@ -1,5 +1,6 @@
 use super::structs::{Config, PartialConfig};
 use crate::traits::builder::Builder;
+use std::path::PathBuf;
 pub struct ConfigBuilder {
     pub config: PartialConfig,
 }
@@ -32,7 +33,7 @@ impl ConfigBuilder {
 impl Builder<Config> for ConfigBuilder {
     fn build(self) -> Config {
         Config {
-            root: self.config.root.unwrap_or_default(),
+            root: self.config.root.unwrap_or_else(|| PathBuf::from(".")),
             exclude: self.config.exclude,
             max_depth: self.config.max_depth,
             size: self.config.size.unwrap_or(false),

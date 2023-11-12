@@ -7,7 +7,7 @@ use std::path::PathBuf;
 pub struct Args {
     /// Root directory to start the tree display
     #[clap()]
-    pub root: PathBuf,
+    pub root: Option<PathBuf>,
 
     /// Exclude certain file types or directories from the display
     #[clap(short, long)]
@@ -35,7 +35,7 @@ impl Loader<Args> for Args {
 impl From<Args> for PartialConfig {
     fn from(args: Args) -> Self {
         Self {
-            root: Some(args.root),
+            root: args.root,
             exclude: args.exclude,
             max_depth: args.max_depth,
             size: args.size,
