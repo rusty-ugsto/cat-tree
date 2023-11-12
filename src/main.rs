@@ -1,5 +1,5 @@
 use crate::{
-    config::{args::Args, builder::ConfigBuilder, env::Env},
+    config::{args::Args, builder::ConfigBuilder},
     traits::{builder::Builder, loader::Loader},
 };
 use handlers::{entry_handler::EntryHandler, error_handler::ErrorHandler};
@@ -31,10 +31,7 @@ fn list_file_service_callback(file_display_template: String) -> ListFilesService
 }
 
 fn main() {
-    let config = ConfigBuilder::new()
-        .merge(Env::new().into())
-        .merge(Args::load().into())
-        .build();
+    let config = ConfigBuilder::new().merge(Args::load().into()).build();
 
     ListFilesServiceBuilder::new()
         .root(config.root)
