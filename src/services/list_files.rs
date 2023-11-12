@@ -62,7 +62,6 @@ impl ListFilesService {
 
 impl Service for ListFilesService {
     fn execute(&self) {
-        println!("{}", self.follow_links);
         let walker = WalkDir::new(&self.root)
             .follow_links(self.follow_links)
             .into_iter()
