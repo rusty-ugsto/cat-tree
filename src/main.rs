@@ -3,7 +3,7 @@ use crate::{
     traits::{builder::Builder, loader::Loader},
 };
 use handlers::{entry_handler::EntryHandler, error_handler::ErrorHandler};
-use services::list_files::ListFilesService;
+use services::list_files::builder::ListFilesServiceBuilder;
 use traits::{handler::Handler, service::Service};
 
 mod config;
@@ -18,22 +18,27 @@ fn main() {
         .merge(Args::load().into())
         .build();
 
-    ListFilesService::new(
-        config.root,
-        config.exclude,
-        config.max_depth,
-        config.all,
-        config.follow_links,
-        Box::new(|depth, file_type, path| {
+    ListFilesServiceBuilder::new()
+        .root(config.root)
+        .exclude(config.exclude)
+        .max_depth(config.max_depth)
+        .all(config.all)
+        .follow_links(config.follow_links)
+        .flatten(config.flatten)
+        .callback(Box::new(|depth, file_type, path| {
             EntryHandler::new(
                 depth,
                 file_type,
                 path,
-                Box::new(|error| ErrorHandler::new(error).execute()),
+                Box::new(|error| {
+                    ErrorHandler::new(error).execute();
+                }),
             )
-            .execute()
-        }),
-        Box::new(|error| ErrorHandler::new(error).execute()),
-    )
-    .execute();
+            .execute();
+        }))
+        .error_callback(Box::new(|error| {
+            ErrorHandler::new(error).execute();
+        }))
+        .build()
+        .execute();
 }

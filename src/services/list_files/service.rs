@@ -7,36 +7,17 @@ use std::{
 use walkdir::WalkDir;
 
 pub struct ListFilesService {
-    root: PathBuf,
-    exclude: HashSet<PathBuf>,
-    max_depth: Option<usize>,
-    all: bool,
-    follow_links: bool,
-    callback: Box<dyn Fn(usize, FileType, PathBuf)>,
-    error_callback: Box<dyn Fn(String)>,
+    pub root: PathBuf,
+    pub exclude: HashSet<PathBuf>,
+    pub max_depth: Option<usize>,
+    pub all: bool,
+    pub follow_links: bool,
+    pub flatten: bool,
+    pub callback: Box<dyn Fn(usize, FileType, PathBuf)>,
+    pub error_callback: Box<dyn Fn(String)>,
 }
 
 impl ListFilesService {
-    pub fn new(
-        root: PathBuf,
-        exclude: HashSet<PathBuf>,
-        max_depth: Option<usize>,
-        all: bool,
-        follow_links: bool,
-        callback: Box<dyn Fn(usize, FileType, PathBuf)>,
-        error_callback: Box<dyn Fn(String)>,
-    ) -> Self {
-        Self {
-            root,
-            exclude,
-            max_depth,
-            all,
-            follow_links,
-            callback,
-            error_callback,
-        }
-    }
-
     fn is_excluded(&self, path: &Path) -> bool {
         self.exclude.contains(path)
     }
@@ -75,7 +56,7 @@ impl Service for ListFilesService {
                 }
             };
 
-            let depth = entry.depth();
+            let depth = if self.flatten { 0 } else { entry.depth() };
             (self.callback)(depth, entry.file_type(), entry.path().to_path_buf());
         }
     }
