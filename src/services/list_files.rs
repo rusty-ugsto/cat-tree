@@ -53,7 +53,7 @@ impl ListFilesService {
             .unwrap_or(false)
     }
 
-    fn should_skip(&self, depth: usize, file_type: FileType, path: &Path) -> bool {
+    fn should_skip(&self, depth: usize, path: &Path) -> bool {
         self.is_excluded(path)
             || (self.is_hidden(path) && !self.all)
             || self.is_max_depth_reached(depth)
@@ -66,9 +66,7 @@ impl Service for ListFilesService {
         let walker = WalkDir::new(&self.root)
             .follow_links(self.follow_links)
             .into_iter()
-            .filter_entry(|entry| {
-                !self.should_skip(entry.depth(), entry.file_type(), entry.path())
-            });
+            .filter_entry(|entry| !self.should_skip(entry.depth(), entry.path()));
         for entry in walker {
             let entry = match entry {
                 Ok(entry) => entry,
