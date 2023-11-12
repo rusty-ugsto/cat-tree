@@ -40,6 +40,10 @@ pub struct Args {
         default_value = "{{ indent }}<{{ path }}> [{{ file_type }}]"
     )]
     pub file_display_template: String,
+
+    /// Template for the file content
+    #[clap(short = 'C', long, default_value = "{{ indent }}  {{ content }}")]
+    pub content_display_template: String,
 }
 
 impl Loader<Args> for Args {
@@ -59,6 +63,7 @@ impl From<Args> for PartialConfig {
             follow_links: args.follow_links,
             flatten: args.flatten,
             file_display_template: Some(args.file_display_template),
+            content_display_template: Some(args.content_display_template),
         }
     }
 }

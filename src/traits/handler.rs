@@ -1,3 +1,3 @@
 pub trait Handler {
-    fn execute(&self);
+    fn execute(&self) -> Result<(), String>;
 }

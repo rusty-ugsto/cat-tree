@@ -11,7 +11,9 @@ impl ErrorHandler {
 }
 
 impl Handler for ErrorHandler {
-    fn execute(&self) {
+    fn execute(&self) -> Result<(), String> {
         eprintln!("{}", self.reason);
+
+        Ok(())
     }
 }

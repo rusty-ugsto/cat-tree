@@ -25,6 +25,9 @@ impl ConfigBuilder {
         self.config.file_display_template = other
             .file_display_template
             .or(self.config.file_display_template);
+        self.config.content_display_template = other
+            .content_display_template
+            .or(self.config.content_display_template);
 
         self
     }
@@ -41,6 +44,7 @@ impl Builder<Config> for ConfigBuilder {
             follow_links: self.config.follow_links.unwrap_or(false),
             flatten: self.config.flatten.unwrap_or(false),
             file_display_template: self.config.file_display_template.unwrap_or_default(),
+            content_display_template: self.config.content_display_template.unwrap_or_default(),
         }
     }
 }

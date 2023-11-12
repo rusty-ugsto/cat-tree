@@ -10,6 +10,7 @@ pub struct Env {
     follow_links: Option<bool>,
     flatten: Option<bool>,
     file_display_template: Option<String>,
+    content_display_template: Option<String>,
 }
 
 impl Env {
@@ -40,6 +41,7 @@ impl Env {
                 .ok()
                 .map(|s| s.to_lowercase() == "true"),
             file_display_template: env::var("CAT_TREE_file_display_TEMPLATE").ok(),
+            content_display_template: env::var("CAT_TREE_content_display_TEMPLATE").ok(),
         }
     }
 }
@@ -55,6 +57,7 @@ impl From<Env> for PartialConfig {
             follow_links: env.follow_links,
             flatten: env.flatten,
             file_display_template: env.file_display_template,
+            content_display_template: env.content_display_template,
         }
     }
 }
