@@ -1,11 +1,10 @@
-use walkdir::WalkDir;
-
 use crate::traits::service::Service;
 use std::{
     collections::HashSet,
     fs::FileType,
     path::{Path, PathBuf},
 };
+use walkdir::WalkDir;
 
 pub struct ListFilesService {
     root: PathBuf,

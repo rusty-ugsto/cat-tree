@@ -24,6 +24,22 @@ pub struct Args {
     /// Include hidden files and directories in the display
     #[clap(short, long, action=clap::ArgAction::SetTrue)]
     pub all: Option<bool>,
+
+    /// Follow symbolic links
+    #[clap(short='l', long, action=clap::ArgAction::SetTrue)]
+    pub follow_links: Option<bool>,
+
+    /// Flatten the directory structure (same indentation for any level)
+    #[clap(short, long, action=clap::ArgAction::SetTrue)]
+    pub flatten: Option<bool>,
+
+    /// Template for the file name
+    #[clap(
+        short = 'F',
+        long,
+        default_value = "{indent}<{file_name}> [{file_type}]"
+    )]
+    pub file_display_template: String,
 }
 
 impl Loader<Args> for Args {
@@ -40,6 +56,9 @@ impl From<Args> for PartialConfig {
             max_depth: args.max_depth,
             size: args.size,
             all: args.all,
+            follow_links: args.follow_links,
+            flatten: args.flatten,
+            file_display_template: Some(args.file_display_template),
         }
     }
 }

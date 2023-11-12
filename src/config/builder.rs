@@ -33,6 +33,9 @@ impl Builder<Config> for ConfigBuilder {
             max_depth: self.config.max_depth,
             size: self.config.size.unwrap_or(false),
             all: self.config.all.unwrap_or(false),
+            follow_links: self.config.follow_links.unwrap_or(false),
+            flatten: self.config.flatten.unwrap_or(false),
+            file_display_template: self.config.file_display_template.unwrap_or_default(),
         }
     }
 }

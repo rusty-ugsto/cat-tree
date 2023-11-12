@@ -7,6 +7,9 @@ pub struct Env {
     max_depth: Option<usize>,
     size: Option<bool>,
     all: Option<bool>,
+    follow_links: Option<bool>,
+    flatten: Option<bool>,
+    file_display_template: Option<String>,
 }
 
 impl Env {
@@ -30,6 +33,13 @@ impl Env {
             all: env::var("CAT_TREE_ALL")
                 .ok()
                 .map(|s| s.to_lowercase() == "true"),
+            follow_links: env::var("CAT_TREE_FOLLOW_LINKS")
+                .ok()
+                .map(|s| s.to_lowercase() == "true"),
+            flatten: env::var("CAT_TREE_FLATTEN")
+                .ok()
+                .map(|s| s.to_lowercase() == "true"),
+            file_display_template: env::var("CAT_TREE_file_display_TEMPLATE").ok(),
         }
     }
 }
@@ -42,6 +52,9 @@ impl From<Env> for PartialConfig {
             max_depth: env.max_depth,
             size: env.size,
             all: env.all,
+            follow_links: env.follow_links,
+            flatten: env.flatten,
+            file_display_template: env.file_display_template,
         }
     }
 }
